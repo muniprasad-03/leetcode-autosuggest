@@ -233,22 +233,6 @@ function handleInput(event) {
                 }
             }
             
-            // ========================================================
-            // CRITICAL FIX: Deduplicate plain words vs <> / () words
-            // ========================================================
-            const lowerSet = new Set(suggestions.map(w => w.toLowerCase()));
-            suggestions = suggestions.filter(word => {
-                // If the word does NOT have brackets, check if a bracketed version exists
-                if (!word.endsWith('<>') && !word.endsWith('()')) {
-                    const lowerWord = word.toLowerCase();
-                    if (lowerSet.has(lowerWord + '<>') || lowerSet.has(lowerWord + '()')) {
-                        return false; // Kill the plain version
-                    }
-                }
-                return true; // Keep everything else
-            });
-            // ========================================================
-            
             currentSuggestions = suggestions.filter(w => w.toLowerCase() !== currentTypingWord.toLowerCase()).slice(0, 8); 
 
             if (currentSuggestions.length > 0) {
@@ -257,7 +241,7 @@ function handleInput(event) {
             } else {
                 suggestionBox.style.display = 'none';
             }
-        } 
+        }
         // STEP 3: Language-Aware N-Gram Predictions
         else if (typeof getPredictiveSuggestions === 'function' && typeof languageData !== 'undefined') {
             if (languageData[currentLanguage] && languageData[currentLanguage].bigrams) {
