@@ -1,13 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "LeetCode AutoSuggest",
-  "version": "1.0",
-  "description": "Auto-suggests local variables and built-in methods in the LeetCode editor.",
+  "name": "LeetCode AutoSuggest AI",
+  "version": "2.0",
+  "description": "An Agentic AI and NLP-powered auto-suggest tool for the LeetCode editor.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
   "content_scripts": [
     {
       "matches": ["*://leetcode.com/problems/*"],
-      "css": ["styles.css"],
-      "js": ["dictionary.js", "content.js"],
+      "css": [
+        "styles.css"
+      ],
+      "js": [
+        "dictionary.js",
+        "trie.js",
+        "nlp.js",
+        "ai.js",
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ]
