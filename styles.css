@@ -1,0 +1,35 @@
+#lc-autosuggest-box {
+    position: fixed;
+    z-index: 2147483647; /* Maximum possible z-index */
+    background-color: #282828;
+    border: 1px solid #444;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    color: #e0e0e0;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 12px; /* Bumped down slightly from 13px */
+    min-width: 150px; /* Reduced from 180px */
+    max-height: 180px; /* Reduced from 200px */
+    overflow-y: auto;
+    pointer-events: auto;
+}
+
+.lc-suggestion-item {
+    padding: 4px 8px; /* Cut padding in half for a much tighter list */
+    cursor: pointer;
+}
+
+/* Default state for typed prefix */
+.lc-suggestion-item strong {
+    color: #4CAF50;
+}
+
+/* The actively selected item via Keyboard Arrow Keys (BLUE HIGHLIGHT) */
+.lc-suggestion-item.lc-selected {
+    background-color: #0066cc !important; 
+    color: #ffffff !important;
+}
+
+.lc-suggestion-item.lc-selected strong {
+    color: #aae0ab !important; 
+}
