@@ -102,6 +102,23 @@ function getSubsequenceSuggestions(targetWord, allWords) {
     return matches.map(m => m.word);
 }
 
+// Truncates class/namespace member suggestions to their parent class if typingWord has no separator.
+function processSuggestionsForSeparators(suggestions, typingWord) {
+    const hasSeparator = typingWord.includes(".") || typingWord.includes("::");
+    if (hasSeparator) return suggestions;
+
+    const processed = suggestions.map(word => {
+        const dotIndex = word.indexOf(".");
+        if (dotIndex !== -1) return word.substring(0, dotIndex + 1);
+        
+        const nsIndex = word.indexOf("::");
+        if (nsIndex !== -1) return word.substring(0, nsIndex + 2);
+        
+        return word;
+    });
+    return [...new Set(processed)];
+}
+
 // Ranks suggestions based on match strength and document term frequency.
 function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
     const typingLower = typingWord.toLowerCase();

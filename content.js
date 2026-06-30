@@ -255,6 +255,10 @@ function handleInput(event) {
                 }
             }
 
+            if (typeof processSuggestionsForSeparators === 'function') {
+                suggestions = processSuggestionsForSeparators(suggestions, currentTypingWord);
+            }
+
             if (suggestions.length > 0 && typeof rankSuggestions === 'function') {
                 suggestions = rankSuggestions(suggestions, currentTypingWord, wordFrequency);
             }
