@@ -1,13 +1,7 @@
-// ==========================================
-// TRIE DATA STRUCTURE (Case-Insensitive)
-// ==========================================
-
 class TrieNode {
     constructor() { 
         this.children = {}; 
-        // We use a Set to store the exact, original camelCase/PascalCase words
-        // even though we navigate the tree using lowercase letters.
-        this.words = new Set(); 
+        this.words = new Set(); // Stores exact casing words
     }
 }
 
@@ -42,7 +36,6 @@ class Trie {
         let node = this.root;
         let lowerPrefix = prefix.toLowerCase(); 
         
-        // Strictly matches the prefix from the starting pointer
         for (let char of lowerPrefix) {
             if (!node.children[char]) return [];
             node = node.children[char];
@@ -54,7 +47,6 @@ class Trie {
     }
 
     getAllWords() {
-        // Used by our NLP logic to grab the entire vocabulary for fuzzy matching
         let results = [];
         this._findWords(this.root, results);
         return results;
