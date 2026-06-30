@@ -152,13 +152,22 @@ function getMemberCompletions(textBeforeCursor, bigramsDictionary) {
     return null;
 }
 
-// Predicts next word from bigrams dictionary.
+// Predicts next word from bigrams/trigrams dictionary (Markov Chain N-gram).
 function getPredictiveSuggestions(textBeforeCursor, bigramsDictionary) {
     if (!textBeforeCursor.endsWith(" ")) return [];
 
     const words = textBeforeCursor.trim().split(/\s+/);
     if (words.length === 0) return [];
     
+    // Try Trigram (last two words)
+    if (words.length >= 2) {
+        const lastTwo = (words[words.length - 2] + " " + words[words.length - 1]).toLowerCase();
+        if (bigramsDictionary[lastTwo]) {
+            return bigramsDictionary[lastTwo];
+        }
+    }
+    
+    // Fallback to Bigram (last single word)
     const lastWord = words[words.length - 1].toLowerCase();
     return bigramsDictionary[lastWord] || [];
 }

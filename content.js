@@ -32,6 +32,23 @@ function getLeetCodeLanguage() {
     return "unknown";
 }
 
+function tokenizeCode(codeText, lang) {
+    let cleanText = codeText;
+    if (lang === 'python' || lang === 'python3') {
+        cleanText = cleanText.replace(/"""[\s\S]*?"""/g, '').replace(/'''[\s\S]*?'''/g, '');
+        cleanText = cleanText.replace(/#.*$/gm, '');
+    } else {
+        cleanText = cleanText.replace(/\/\*[\s\S]*?\*\//g, '');
+        cleanText = cleanText.replace(/\/\/.*$/gm, '');
+    }
+    cleanText = cleanText.replace(/"(\\.|[^"\\])*"/g, '');
+    cleanText = cleanText.replace(/'(\\.|[^'\\])*'/g, '');
+    if (lang === 'javascript' || lang === 'js') {
+        cleanText = cleanText.replace(/`([\s\S]*?)`/g, '');
+    }
+    return cleanText;
+}
+
 function extractWordsToTrie() {
     const lineElements = document.querySelectorAll('.view-line');
     if (lineElements.length === 0) return;
@@ -43,10 +60,18 @@ function extractWordsToTrie() {
 
     trie.clear();
     preLoadDataTypes(currentLanguage); 
+    
     wordFrequency = {};
+    if (typeof languageData !== 'undefined' && languageData[currentLanguage]?.keywords) {
+        languageData[currentLanguage].keywords.forEach(keyword => {
+            wordFrequency[keyword] = 5; // seed base keyword weights
+        });
+    }
+
+    const cleanCode = tokenizeCode(codeText, currentLanguage);
 
     // Extract variables and function words
-    const words = codeText.match(/\b[a-zA-Z_]\w*\b/g) || [];
+    const words = cleanCode.match(/\b[a-zA-Z_]\w*\b/g) || [];
     words.forEach(word => {
         if (word.length > 2 && !ignoreList.has(word)) {
             trie.insert(word);
@@ -55,7 +80,7 @@ function extractWordsToTrie() {
     });
 
     // Detect user-defined methods
-    const methods = codeText.matchAll(/\b([a-zA-Z_]\w*)\s*\(/g);
+    const methods = cleanCode.matchAll(/\b([a-zA-Z_]\w*)\s*\(/g);
     for (const match of methods) {
         const methodWord = match[1];
         if (methodWord.length > 2 && !ignoreList.has(methodWord)) {

@@ -34,6 +34,7 @@ const languageData = {
             'MOD', 'INF', 'isValid', 'visited', 'memo', 'adj', 'parent', 'dist', 'grid', 'dp'
         ],
         bigrams: {
+            // Markov Bigram (1-word state transitions)
             'public': ['static', 'void', 'int', 'String', 'boolean', 'List<>', 'final', 'class'],
             'private': ['void', 'int', 'String', 'boolean', 'ListNode', 'TreeNode'],
             'static': ['void', 'int', 'boolean', 'String', 'class'],
@@ -45,7 +46,13 @@ const languageData = {
             'character.': ['isDigit(', 'isLetter(', 'isLetterOrDigit(', 'isWhitespace(', 'toLowerCase(', 'toUpperCase('],
             'integer.': ['parseInt(', 'compare(', 'MAX_VALUE', 'MIN_VALUE', 'toString('],
             'long.': ['parseLong(', 'compare(', 'MAX_VALUE', 'MIN_VALUE', 'toString('],
-            'string.': ['valueOf(', 'join(']
+            'string.': ['valueOf(', 'join('],
+            // Markov Trigram (2-word state transitions)
+            'public static': ['void', 'int', 'String', 'boolean', 'double'],
+            'static void': ['main(', 'solve(', 'dfs(', 'bfs('],
+            'for (int': ['i = 0;', 'j = 0;', 'k = 0;'],
+            'while (!': ['queue.isEmpty()', 'stack.isEmpty()', 'q.isEmpty()', 's.isEmpty()'],
+            'if (root': ['== null)', '!= null)']
         }
     },
 
@@ -72,7 +79,11 @@ const languageData = {
             'const': ['int', 'auto&'],
             '#include': ['<iostream>', '<vector>', '<string>', '<algorithm>', '<unordered_map>', '<unordered_set>', '<queue>', '<stack>', '<bits/stdc++.h>'],
             'using': ['namespace std;'],
-            'return': ['0;', 'true;', 'false;', 'ans;', 'res;', '-1;', 'nullptr;']
+            'return': ['0;', 'true;', 'false;', 'ans;', 'res;', '-1;', 'nullptr;'],
+            // Markov Trigrams
+            'for (int': ['i = 0;', 'j = 0;'],
+            'while (!': ['q.empty()', 's.empty()'],
+            'if (root': ['== nullptr)', '!= nullptr)']
         }
     },
 
@@ -86,7 +97,8 @@ const languageData = {
             'WHERE': ['id =', 'status ='],
             'GROUP': ['BY '],
             'ORDER': ['BY '],
-            'ON': ['a.id = b.id']
+            'ON': ['a.id = b.id'],
+            'inner join': ['users', 'orders']
         }
     },
 
@@ -104,7 +116,10 @@ const languageData = {
             'import': ['heapq', 'collections', 'math'],
             'collections.': ['defaultdict(list)', 'defaultdict(int)', 'Counter()', 'deque()'],
             'heapq.': ['heappush(heap, ', 'heappop(heap)'],
-            'return': ['True', 'False', 'None', 'ans', '-1', '0']
+            'return': ['True', 'False', 'None', 'ans', '-1', '0'],
+            // Markov Trigrams
+            'for i': ['in range(', 'in enumerate('],
+            'if not': ['root:', 'visited:']
         }
     },
 
@@ -120,7 +135,9 @@ const languageData = {
             'const': ['map = new Map();', 'set = new Set();', 'n = ', 'dp = ', 'queue = [];'],
             'let': ['ans = ', 'res = ', 'count = 0;', 'i = 0;'],
             'new': ['Map()', 'Set()', 'Array()'],
-            'return': ['true;', 'false;', 'null;', 'ans;', '-1;', '0;']
+            'return': ['true;', 'false;', 'null;', 'ans;', '-1;', '0;'],
+            // Markov Trigrams
+            'for (let': ['i = 0;', 'j = 0;']
         }
     }
 };
