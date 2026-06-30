@@ -9,6 +9,7 @@ let currentTypingWord = "";
 let currentSuggestions = [];
 let selectedIndex = 0;
 let lastCursorPos = { top: '150px', left: '150px' };
+let wordFrequency = {};
 
 const ignoreList = new Set(['return', 'true', 'false', 'if', 'else', 'for', 'while', 'new', 'this', 'public', 'private', 'class', 'void']);
 
@@ -54,10 +55,17 @@ function extractWordsToTrie() {
     trie.clear();
     preLoadDataTypes(currentLanguage); 
 
+    // Reset frequencies
+    wordFrequency = {};
+
     // 1. Extract standard variables and words
     const words = codeText.match(/\b[a-zA-Z_]\w*\b/g) || [];
     words.forEach(word => {
-        if (word.length > 2 && !ignoreList.has(word)) trie.insert(word);
+        if (word.length > 2 && !ignoreList.has(word)) {
+            trie.insert(word);
+            // Track Term Frequency (TF)
+            wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+        }
     });
 
     // 2. Detect user-defined methods (words followed by an open parenthesis)
@@ -65,7 +73,9 @@ function extractWordsToTrie() {
     for (const match of methods) {
         const methodWord = match[1];
         if (methodWord.length > 2 && !ignoreList.has(methodWord)) {
-            trie.insert(methodWord + '()');
+            const methodSig = methodWord + '()';
+            trie.insert(methodSig);
+            wordFrequency[methodSig] = (wordFrequency[methodSig] || 0) + 1;
         }
     }
 
@@ -222,41 +232,63 @@ function handleInput(event) {
             currentTypingWord = "";
         }
 
-        if (currentTypingWord.length >= 1) {
-            // STEP 1: Fast Trie Lookup
-            let suggestions = trie.getWordsWithPrefix(currentTypingWord);
+        let suggestions = [];
+        let isPrediction = false;
+
+        // 1. Check for Member Completion (e.g. Arrays.s or std::v or Arrays. or std::)
+        if (typeof getMemberCompletions === 'function' && typeof languageData !== 'undefined' && languageData[currentLanguage]?.bigrams) {
+            const memberCompletions = getMemberCompletions(textBeforeCursor, languageData[currentLanguage].bigrams);
+            if (memberCompletions && memberCompletions.length > 0) {
+                suggestions = memberCompletions;
+                isPrediction = true;
+            }
+        }
+
+        // 2. If no member completions, and we have a typed word, search Trie/Subsequence/Fuzzy
+        if (suggestions.length === 0 && currentTypingWord.length >= 1) {
+            // STEP A: Fast Trie Lookup
+            suggestions = trie.getWordsWithPrefix(currentTypingWord);
             
-            // STEP 2: Fuzzy Fallback (Pulls from nlp.js)
+            // STEP B: Subsequence / Abbreviation Matcher
+            if (suggestions.length < 5 && currentTypingWord.length >= 2) {
+                if (typeof getSubsequenceSuggestions === 'function') {
+                    const subSeqSugs = getSubsequenceSuggestions(currentTypingWord, trie.getAllWords());
+                    suggestions = [...new Set([...suggestions, ...subSeqSugs])];
+                }
+            }
+            
+            // STEP C: Fuzzy Fallback (Damerau-Levenshtein)
             if (suggestions.length === 0 && currentTypingWord.length >= 3) {
                 if (typeof getFuzzySuggestions === 'function') {
                     suggestions = getFuzzySuggestions(currentTypingWord, trie.getAllWords(), 2);
                 }
             }
-            
-            currentSuggestions = suggestions.filter(w => w.toLowerCase() !== currentTypingWord.toLowerCase()).slice(0, 8); 
 
-            if (currentSuggestions.length > 0) {
-                if (selectedIndex >= currentSuggestions.length) selectedIndex = 0;
-                renderSuggestions(false);
-            } else {
-                suggestionBox.style.display = 'none';
+            // STEP D: Rank suggestions using unified NLP scoring (Prefix, Subsequence, Fuzzy, TF)
+            if (suggestions.length > 0 && typeof rankSuggestions === 'function') {
+                suggestions = rankSuggestions(suggestions, currentTypingWord, wordFrequency);
+            }
+
+            // Filter out exact match
+            suggestions = suggestions.filter(w => w.toLowerCase() !== currentTypingWord.toLowerCase());
+        }
+
+        // 3. If still no suggestions, check for space-based predictions
+        if (suggestions.length === 0 && currentTypingWord.length === 0) {
+            if (typeof getPredictiveSuggestions === 'function' && typeof languageData !== 'undefined' && languageData[currentLanguage]?.bigrams) {
+                const predictions = getPredictiveSuggestions(textBeforeCursor, languageData[currentLanguage].bigrams);
+                if (predictions.length > 0) {
+                    suggestions = predictions;
+                    isPrediction = true;
+                }
             }
         }
-        // STEP 3: Language-Aware N-Gram Predictions
-        else if (typeof getPredictiveSuggestions === 'function' && typeof languageData !== 'undefined') {
-            if (languageData[currentLanguage] && languageData[currentLanguage].bigrams) {
-                const predictions = getPredictiveSuggestions(textBeforeCursor, languageData[currentLanguage].bigrams);
-                
-                if (predictions.length > 0) {
-                    currentSuggestions = predictions;
-                    selectedIndex = 0;
-                    renderSuggestions(true); 
-                } else {
-                    closeBox();
-                }
-            } else {
-                closeBox();
-            }
+
+        currentSuggestions = suggestions.slice(0, 8);
+
+        if (currentSuggestions.length > 0) {
+            if (selectedIndex >= currentSuggestions.length) selectedIndex = 0;
+            renderSuggestions(isPrediction);
         } else {
             closeBox();
         }
