@@ -139,7 +139,7 @@ function renderSuggestions(isPrediction = false) {
                 const originalSuffix = suggest.substring(currentTypingWord.length);
                 item.innerHTML = `<strong>${originalPrefix}</strong>${originalSuffix}`;
             } else {
-                item.innerHTML = `${suggest} <span style="font-size: 10px; color: #888;">(fuzzy)</span>`;
+                item.innerHTML = suggest;
             }
         }
         
