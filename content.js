@@ -7,7 +7,6 @@ let selectedIndex = 0;
 let lastCursorPos = { top: '150px', left: '150px' };
 let wordFrequency = {};
 
-const ignoreList = new Set(['return', 'true', 'false', 'if', 'else', 'for', 'while', 'new', 'this', 'public', 'private', 'class', 'void']);
 
 function preLoadDataTypes(lang) {
     if (typeof languageData !== 'undefined' && languageData[lang] && languageData[lang].keywords) {
@@ -73,7 +72,7 @@ function extractWordsToTrie() {
     // Extract variables and function words
     const words = cleanCode.match(/\b[a-zA-Z_]\w*\b/g) || [];
     words.forEach(word => {
-        if (word.length > 2 && !ignoreList.has(word)) {
+        if (word.length > 2) {
             trie.insert(word);
             wordFrequency[word] = (wordFrequency[word] || 0) + 1;
         }
@@ -83,7 +82,7 @@ function extractWordsToTrie() {
     const methods = cleanCode.matchAll(/\b([a-zA-Z_]\w*)\s*\(/g);
     for (const match of methods) {
         const methodWord = match[1];
-        if (methodWord.length > 2 && !ignoreList.has(methodWord)) {
+        if (methodWord.length > 2) {
             const methodSig = methodWord + '()';
             trie.insert(methodSig);
             wordFrequency[methodSig] = (wordFrequency[methodSig] || 0) + 1;
@@ -112,7 +111,13 @@ function insertWord(fullWord) {
         document.execCommand('insertText', false, fullWord);
         
         let offset = 0;
-        if (fullWord.endsWith('<>()')) {
+        if (fullWord === '( ) {') {
+            offset = 3;
+        } else if (fullWord === '(int i = 0; i < ; i++) {' || fullWord === '(let i = 0; i < ; i++) {') {
+            offset = 8;
+        } else if (fullWord === 'i in range():') {
+            offset = 2;
+        } else if (fullWord.endsWith('<>()')) {
             offset = 3;
         } else if (fullWord.endsWith('()') || fullWord.endsWith('<>')) {
             offset = 1;

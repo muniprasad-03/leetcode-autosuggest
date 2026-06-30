@@ -35,6 +35,9 @@ const languageData = {
         ],
         bigrams: {
             // Markov Bigram (1-word state transitions)
+            'for': ['(int i = 0; i < ; i++) {'],
+            'if': ['( ) {'],
+            'while': ['( ) {'],
             'public': ['static', 'void', 'int', 'String', 'boolean', 'List<>', 'final', 'class'],
             'private': ['void', 'int', 'String', 'boolean', 'ListNode', 'TreeNode'],
             'static': ['void', 'int', 'boolean', 'String', 'class'],
@@ -71,6 +74,9 @@ const languageData = {
             'substr()', 'stoi()', 'to_string()', 'INT_MAX', 'INT_MIN'
         ],
         bigrams: {
+            'for': ['(int i = 0; i < ; i++) {'],
+            'if': ['( ) {'],
+            'while': ['( ) {'],
             'std::': ['vector<', 'string', 'unordered_map<', 'unordered_set<', 'sort()', 'min', 'max'],
             'vector<': ['int>', 'string>', 'vector<int>>', 'bool>'],
             'unordered_map<': ['int, int>', 'char, int>', 'string, int>'],
@@ -112,6 +118,7 @@ const languageData = {
             'def', 'class', 'import', 'return', 'if', 'else', 'for', 'while', 'in'
         ],
         bigrams: {
+            'for': ['i in range():'],
             'def': ['solve(self,', 'dfs(node):', '__init__(self):'],
             'import': ['heapq', 'collections', 'math'],
             'collections.': ['defaultdict(list)', 'defaultdict(int)', 'Counter()', 'deque()'],
@@ -132,6 +139,9 @@ const languageData = {
             'const', 'let', 'function', 'return', 'if', 'else', 'for', 'while', 'new'
         ],
         bigrams: {
+            'for': ['(let i = 0; i < ; i++) {'],
+            'if': ['( ) {'],
+            'while': ['( ) {'],
             'const': ['map = new Map();', 'set = new Set();', 'n = ', 'dp = ', 'queue = [];'],
             'let': ['ans = ', 'res = ', 'count = 0;', 'i = 0;'],
             'new': ['Map()', 'Set()', 'Array()'],
