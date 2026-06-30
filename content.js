@@ -162,7 +162,7 @@ function renderSuggestions(isPrediction = false) {
         if (index === selectedIndex) item.classList.add('lc-selected');
         
         if (isPrediction) {
-            item.innerHTML = `<span style="color:#aaa;">✨ Predict:</span> ${suggest}`;
+            item.innerHTML = suggest;
         } else {
             const lowerSuggest = suggest.toLowerCase();
             const lowerTyping = currentTypingWord.toLowerCase();
