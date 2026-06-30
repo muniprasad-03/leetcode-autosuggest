@@ -6,7 +6,7 @@ let currentSuggestions = [];
 let selectedIndex = 0;
 let lastCursorPos = { top: '150px', left: '150px' };
 let wordFrequency = {};
-
+let lastParsedCode = "";
 
 function preLoadDataTypes(lang) {
     if (typeof languageData !== 'undefined' && languageData[lang] && languageData[lang].keywords) {
@@ -56,6 +56,9 @@ function extractWordsToTrie() {
 
     let codeText = "";
     lineElements.forEach(line => { codeText += line.textContent + "\n"; });
+
+    if (codeText === lastParsedCode) return;
+    lastParsedCode = codeText;
 
     trie.clear();
     preLoadDataTypes(currentLanguage); 

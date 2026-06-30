@@ -8,9 +8,15 @@ class TrieNode {
 class Trie {
     constructor() { 
         this.root = new TrieNode(); 
+        this.allWordsList = []; // Caches inserted words for O(1) retrieval
+        this.allWordsSet = new Set(); // O(1) duplicate checks
     }
     
     insert(word) {
+        if (this.allWordsSet.has(word)) return;
+        this.allWordsSet.add(word);
+        this.allWordsList.push(word);
+
         let node = this.root;
         let lowerWord = word.toLowerCase(); 
         
@@ -47,12 +53,12 @@ class Trie {
     }
 
     getAllWords() {
-        let results = [];
-        this._findWords(this.root, results);
-        return results;
+        return this.allWordsList; // O(1) reference return, zero allocations
     }
     
     clear() { 
         this.root = new TrieNode(); 
+        this.allWordsList = [];
+        this.allWordsSet.clear();
     }
 }

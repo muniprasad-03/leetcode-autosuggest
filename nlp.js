@@ -1,18 +1,40 @@
+// Pre-allocated matrix buffer to avoid GC pressure in Damerau-Levenshtein
+let dlMatrix = null;
+const DL_MAX_SIZE = 64;
+
+// Fast character code check replacing slow RegExp test
+function isAlphanumericChar(char) {
+    const code = char.charCodeAt(0);
+    return (code >= 48 && code <= 57) ||  // 0-9
+           (code >= 65 && code <= 90) ||  // A-Z
+           (code >= 97 && code <= 122);   // a-z
+}
+
 // Calculates Damerau-Levenshtein distance between string 'a' and 'b'.
 function getDamerauLevenshteinDistance(a, b) {
     a = a.toLowerCase();
     b = b.toLowerCase();
     
-    if (a.length === 0) return b.length;
-    if (b.length === 0) return a.length;
+    const aLen = a.length;
+    const bLen = b.length;
     
-    const matrix = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(null));
+    if (aLen === 0) return bLen;
+    if (bLen === 0) return aLen;
     
-    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
-    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+    if (!dlMatrix) {
+        dlMatrix = Array(DL_MAX_SIZE).fill(null).map(() => new Int32Array(DL_MAX_SIZE));
+    }
     
-    for (let j = 1; j <= b.length; j++) {
-        for (let i = 1; i <= a.length; i++) {
+    let matrix = dlMatrix;
+    if (aLen >= DL_MAX_SIZE || bLen >= DL_MAX_SIZE) {
+        matrix = Array(bLen + 1).fill(null).map(() => new Int32Array(aLen + 1));
+    }
+    
+    for (let i = 0; i <= aLen; i++) matrix[0][i] = i;
+    for (let j = 0; j <= bLen; j++) matrix[j][0] = j;
+    
+    for (let j = 1; j <= bLen; j++) {
+        for (let i = 1; i <= aLen; i++) {
             const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
             matrix[j][i] = Math.min(
                 matrix[j][i - 1] + 1,            // insertion
@@ -29,14 +51,15 @@ function getDamerauLevenshteinDistance(a, b) {
             }
         }
     }
-    return matrix[b.length][a.length];
+    return matrix[bLen][aLen];
 }
 
 // Filters words within maxDistance, sorted by distance.
 function getFuzzySuggestions(targetWord, allWords, maxDistance = 2) {
     let matches = [];
+    const targetLen = targetWord.length;
     for (let word of allWords) {
-        if (Math.abs(word.length - targetWord.length) > maxDistance) continue;
+        if (Math.abs(word.length - targetLen) > maxDistance) continue;
         
         let dist = getDamerauLevenshteinDistance(targetWord, word);
         if (dist <= maxDistance) {
@@ -67,7 +90,7 @@ function scoreSubsequence(pattern, word) {
                 weight += 12; // word start bonus
             } else if (word[wIdx] !== wordLower[wIdx]) {
                 weight += 10; // camelCase boundary
-            } else if (wIdx > 0 && !/[a-zA-Z0-9]/.test(word[wIdx - 1])) {
+            } else if (wIdx > 0 && !isAlphanumericChar(word[wIdx - 1])) {
                 weight += 10; // non-alphanumeric separator boundary
             }
             
@@ -92,7 +115,10 @@ function scoreSubsequence(pattern, word) {
 // Returns subsequence matches sorted by score.
 function getSubsequenceSuggestions(targetWord, allWords) {
     let matches = [];
+    const targetLen = targetWord.length;
     for (let word of allWords) {
+        if (word.length < targetLen) continue; // Length pruning optimization
+        
         const score = scoreSubsequence(targetWord, word);
         if (score !== null) {
             matches.push({ word, score });
