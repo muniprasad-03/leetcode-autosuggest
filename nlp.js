@@ -175,11 +175,26 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
         const tfBoost = Math.min(tf * 3, 25);
         
         // Priority categories:
+        // Category 0: Abbreviation matches (highest priority)
         // Category 1: Variables (not ending in (), not in inbuiltKeywords)
         // Category 2: Functions in the editor (ending in (), not in inbuiltKeywords)
         // Category 3: Inbuilt methods/keywords (in inbuiltKeywords)
         let category = 3;
-        if (typeof inbuiltKeywords !== 'undefined' && inbuiltKeywords.has(word)) {
+        let isAbbr = false;
+        if (typeof languageData !== 'undefined' && typeof currentLanguage !== 'undefined' && languageData[currentLanguage]?.abbreviations) {
+            const abbrs = languageData[currentLanguage].abbreviations;
+            for (const key in abbrs) {
+                if (key.startsWith(typingLower) && abbrs[key] === word) {
+                    isAbbr = true;
+                    break;
+                }
+            }
+        }
+
+        if (isAbbr) {
+            category = 0;
+            isPrefixMatch = 0;
+        } else if (typeof inbuiltKeywords !== 'undefined' && inbuiltKeywords.has(word)) {
             category = 3;
         } else if (word.endsWith('()')) {
             category = 2;

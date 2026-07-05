@@ -33,6 +33,10 @@ const languageData = {
             'Character.isDigit()', 'Character.isLetter()', 'Character.isLetterOrDigit()', 'Character.isWhitespace()',
             'Character.toLowerCase()', 'Character.toUpperCase()', 'String.valueOf()', 'String.join()'
         ],
+        abbreviations: {
+            'sysout': 'System.out.println()',
+            'syso': 'System.out.println()'
+        },
         bigrams: {
             // Markov Bigram (1-word state transitions)
             'for': ['(int i = 0; i < ; i++) {'],
@@ -75,6 +79,10 @@ const languageData = {
             'std::min()', 'std::max()', 'std::abs()', 'std::swap()',
             'substr()', 'stoi()', 'to_string()', 'INT_MAX', 'INT_MIN'
         ],
+        abbreviations: {
+            'cout': 'std::cout << ',
+            'cin': 'std::cin >> '
+        },
         bigrams: {
             'for': ['(int i = 0; i < ; i++) {'],
             'if': ['( ) {'],
@@ -142,6 +150,10 @@ const languageData = {
             'const', 'let', 'function', 'return', 'if()', 'else', 'for()', 'while()', 'new',
             'break', 'continue'
         ],
+        abbreviations: {
+            'clg': 'console.log()',
+            'log': 'console.log()'
+        },
         bigrams: {
             'for': ['(let i = 0; i < ; i++) {'],
             'if': ['( ) {'],

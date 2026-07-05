@@ -256,7 +256,18 @@ function handleInput(event) {
 
         // 2. Trie & fallback matching
         if (suggestions.length === 0 && currentTypingWord.length >= 1) {
-            suggestions = trie.getWordsWithPrefix(currentTypingWord);
+            if (typeof languageData !== 'undefined' && languageData[currentLanguage]?.abbreviations) {
+                const abbrs = languageData[currentLanguage].abbreviations;
+                const typingLower = currentTypingWord.toLowerCase();
+                for (const key in abbrs) {
+                    if (key.startsWith(typingLower)) {
+                        suggestions.push(abbrs[key]);
+                    }
+                }
+            }
+            
+            const trieSugs = trie.getWordsWithPrefix(currentTypingWord);
+            suggestions = [...new Set([...suggestions, ...trieSugs])];
             
             if (suggestions.length < 5 && currentTypingWord.length >= 2) {
                 if (typeof getSubsequenceSuggestions === 'function') {
