@@ -7,14 +7,14 @@ const languageData = {
             'int', 'double', 'boolean', 'char', 'long', 'void', 'String', 'Math', 'System',
             // Core DSA Structures
             'List<>', 'ArrayList<>', 'LinkedList<>', 'Map<>', 'HashMap<>', 'TreeMap<>',
-            'Set<>', 'HashSet<>', 'TreeSet<>', 'Queue<>', 'PriorityQueue<>', 'Deque<>', 'ArrayDeque<>', 
+            'Set<>', 'HashSet<>', 'TreeSet<>', 'Queue<>', 'PriorityQueue<>', 'Deque<>', 'ArrayDeque<>',
             'Stack<>', 'ListNode', 'TreeNode', 'StringBuilder',
             // String Methods
-            'length()', 'charAt()', 'substring()', 'indexOf()', 'lastIndexOf()', 'equals()', 'equalsIgnoreCase()', 
+            'length()', 'charAt()', 'substring()', 'indexOf()', 'lastIndexOf()', 'equals()', 'equalsIgnoreCase()',
             'compareTo()', 'split()', 'replace()', 'replaceAll()', 'trim()', 'startsWith()', 'endsWith()', 'toCharArray()',
             // Collection Methods
-            'size()', 'isEmpty()', 'clear()', 'contains()', 'containsKey()', 'containsValue()', 
-            'put()', 'putIfAbsent()', 'computeIfAbsent()', 'get()', 'getOrDefault()', 'remove()', 
+            'size()', 'isEmpty()', 'clear()', 'contains()', 'containsKey()', 'containsValue()',
+            'put()', 'putIfAbsent()', 'computeIfAbsent()', 'get()', 'getOrDefault()', 'remove()',
             'add()', 'addAll()', 'poll()', 'peek()', 'push()', 'pop()', 'offer()', 'offerFirst()', 'offerLast()',
             'pollFirst()', 'pollLast()', 'peekFirst()', 'peekLast()', 'keySet()', 'values()', 'entrySet()',
             // Treemap/Treeset specific
@@ -22,18 +22,16 @@ const languageData = {
             'firstEntry()', 'lastEntry()', 'higherEntry()', 'lowerEntry()', 'ceilingEntry()', 'floorEntry()',
             // Arrays & Collections utils
             'Arrays.sort()', 'Arrays.fill()', 'Arrays.binarySearch()', 'Arrays.copyOf()', 'Arrays.copyOfRange()', 'Arrays.asList()',
-            'Collections.sort()', 'Collections.reverse()', 'Collections.max()', 'Collections.min()', 'Collections.swap()', 
+            'Collections.sort()', 'Collections.reverse()', 'Collections.max()', 'Collections.min()', 'Collections.swap()',
             'Collections.reverseOrder()', 'Collections.frequency()', 'Collections.shuffle()',
             // Math Methods
-            'Math.max()', 'Math.min()', 'Math.abs()', 'Math.pow()', 'Math.sqrt()', 'Math.ceil()', 'Math.floor()', 
+            'Math.max()', 'Math.min()', 'Math.abs()', 'Math.pow()', 'Math.sqrt()', 'Math.ceil()', 'Math.floor()',
             'Math.round()', 'Math.log()', 'Math.log10()', 'Math.gcd()',
             // Wrapper helpers
             'Integer.parseInt()', 'Integer.compare()', 'Integer.toString()', 'Integer.MAX_VALUE', 'Integer.MIN_VALUE',
             'Long.parseLong()', 'Long.compare()', 'Long.toString()', 'Long.MAX_VALUE', 'Long.MIN_VALUE',
             'Character.isDigit()', 'Character.isLetter()', 'Character.isLetterOrDigit()', 'Character.isWhitespace()',
-            'Character.toLowerCase()', 'Character.toUpperCase()', 'String.valueOf()', 'String.join()',
-            // Common CP variables/functions
-            'MOD', 'INF', 'isValid', 'visited', 'memo', 'adj', 'parent', 'dist', 'grid', 'dp'
+            'Character.toLowerCase()', 'Character.toUpperCase()', 'String.valueOf()', 'String.join()'
         ],
         bigrams: {
             // Markov Bigram (1-word state transitions)
@@ -70,10 +68,10 @@ const languageData = {
             'vector<>', 'unordered_map<>', 'unordered_set<>', 'map<>', 'set<>',
             'queue<>', 'priority_queue<>', 'stack<>', 'pair<>',
             // STL Methods & Algorithms
-            'push_back()', 'pop_back()', 'push()', 'pop()', 'top()', 'front()', 'back()', 
+            'push_back()', 'pop_back()', 'push()', 'pop()', 'top()', 'front()', 'back()',
             'insert()', 'erase()', 'empty()', 'size()', 'clear()', 'begin()', 'end()',
             'find()', 'count()', 'lower_bound()', 'upper_bound()',
-            'std::sort()', 'std::reverse()', 'std::fill()', 'std::memset()', 
+            'std::sort()', 'std::reverse()', 'std::fill()', 'std::memset()',
             'std::min()', 'std::max()', 'std::abs()', 'std::swap()',
             'substr()', 'stoi()', 'to_string()', 'INT_MAX', 'INT_MIN'
         ],

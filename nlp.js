@@ -155,9 +155,11 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
     const scored = suggestions.map(word => {
         const wordLower = word.toLowerCase();
         let matchScore = 0;
+        let isPrefixMatch = 0; // 0 for prefix matches, 1 for others (lower number = higher priority)
         
         if (wordLower.startsWith(typingLower)) {
             matchScore = 120 + (typingWord.length / word.length) * 15;
+            isPrefixMatch = 0;
         } else {
             const subScore = scoreSubsequence(typingWord, word);
             if (subScore !== null) {
@@ -166,6 +168,7 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
                 const dist = getDamerauLevenshteinDistance(typingWord, word);
                 matchScore = 10 + (3 - dist) * 10;
             }
+            isPrefixMatch = 1;
         }
         
         const tf = wordFrequency[word] || 0;
@@ -184,10 +187,13 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
             category = 1;
         }
         
-        return { word, score: matchScore + tfBoost, category };
+        return { word, score: matchScore + tfBoost, category, isPrefixMatch };
     });
     
     scored.sort((a, b) => {
+        if (a.isPrefixMatch !== b.isPrefixMatch) {
+            return a.isPrefixMatch - b.isPrefixMatch;
+        }
         if (a.category !== b.category) {
             return a.category - b.category;
         }
