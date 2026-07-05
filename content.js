@@ -9,8 +9,16 @@ let wordFrequency = {};
 let lastParsedCode = "";
 
 function preLoadDataTypes(lang) {
+    if (typeof inbuiltKeywords !== 'undefined') {
+        inbuiltKeywords.clear();
+    }
     if (typeof languageData !== 'undefined' && languageData[lang] && languageData[lang].keywords) {
-        languageData[lang].keywords.forEach(type => trie.insert(type));
+        languageData[lang].keywords.forEach(type => {
+            trie.insert(type);
+            if (typeof inbuiltKeywords !== 'undefined') {
+                inbuiltKeywords.add(type);
+            }
+        });
     }
 }
 

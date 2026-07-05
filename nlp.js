@@ -2,6 +2,9 @@
 let dlMatrix = null;
 const DL_MAX_SIZE = 64;
 
+// Global tracking of inbuilt keywords to prioritize user definitions over them
+const inbuiltKeywords = new Set();
+
 // Fast character code check replacing slow RegExp test
 function isAlphanumericChar(char) {
     const code = char.charCodeAt(0);
@@ -168,10 +171,28 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
         const tf = wordFrequency[word] || 0;
         const tfBoost = Math.min(tf * 3, 25);
         
-        return { word, score: matchScore + tfBoost };
+        // Priority categories:
+        // Category 1: Variables (not ending in (), not in inbuiltKeywords)
+        // Category 2: Functions in the editor (ending in (), not in inbuiltKeywords)
+        // Category 3: Inbuilt methods/keywords (in inbuiltKeywords)
+        let category = 3;
+        if (typeof inbuiltKeywords !== 'undefined' && inbuiltKeywords.has(word)) {
+            category = 3;
+        } else if (word.endsWith('()')) {
+            category = 2;
+        } else {
+            category = 1;
+        }
+        
+        return { word, score: matchScore + tfBoost, category };
     });
     
-    scored.sort((a, b) => b.score - a.score || a.word.localeCompare(b.word));
+    scored.sort((a, b) => {
+        if (a.category !== b.category) {
+            return a.category - b.category;
+        }
+        return b.score - a.score || a.word.localeCompare(b.word);
+    });
     return scored.map(item => item.word);
 }
 
