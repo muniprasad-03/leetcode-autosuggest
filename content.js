@@ -7,6 +7,7 @@ let selectedIndex = 0;
 let lastCursorPos = { top: '150px', left: '150px' };
 let wordFrequency = {};
 let lastParsedCode = "";
+let inputTimeout = null;
 
 function preLoadDataTypes(lang) {
     if (typeof inbuiltKeywords !== 'undefined') {
@@ -209,6 +210,28 @@ function handleInput(event) {
     const modifiers = new Set(['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']);
     if (modifiers.has(event.key)) return;
 
+    if (event.key === 'Backspace') {
+        const active = document.activeElement;
+        if (active && active.tagName === 'TEXTAREA') {
+            const start = active.selectionStart;
+            const end = active.selectionEnd;
+            if (start === end && start > 0) {
+                const val = active.value;
+                const charBefore = val.charAt(start - 1);
+                const charAfter = val.charAt(start);
+                const bracePairs = { '(': ')', '{': '}', '[': ']', '<': '>' };
+                if (bracePairs[charBefore] === charAfter) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    active.setSelectionRange(start - 1, start + 1);
+                    document.execCommand('insertText', false, '');
+                    closeBox();
+                    return;
+                }
+            }
+        }
+    }
+
     if (suggestionBox && suggestionBox.style.display === 'block') {
         if (event.key === 'ArrowDown') {
             event.preventDefault(); event.stopPropagation();
@@ -229,8 +252,9 @@ function handleInput(event) {
         }
     }
 
-    // Wait for Monaco value update
-    setTimeout(() => {
+    // Wait for Monaco value update (with debounce optimization)
+    if (inputTimeout) clearTimeout(inputTimeout);
+    inputTimeout = setTimeout(() => {
         const active = document.activeElement;
         let textBeforeCursor = "";
         
