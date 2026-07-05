@@ -221,12 +221,11 @@ function handleInput(event) {
                 const charAfter = val.charAt(start);
                 const bracePairs = { '(': ')', '{': '}', '[': ']', '<': '>' };
                 if (bracePairs[charBefore] === charAfter) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    active.setSelectionRange(start - 1, start + 1);
-                    document.execCommand('insertText', false, '');
+                    // Dispatch Delete to Monaco to delete the closing brace after the cursor
+                    active.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', code: 'Delete', keyCode: 46, bubbles: true }));
+                    active.dispatchEvent(new KeyboardEvent('keyup', { key: 'Delete', code: 'Delete', keyCode: 46, bubbles: true }));
                     closeBox();
-                    return;
+                    // Let the native Backspace event continue to delete the opening brace before the cursor
                 }
             }
         }
