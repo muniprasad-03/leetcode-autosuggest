@@ -1,6 +1,8 @@
 const languageData = {
     "java": {
         keywords: [
+            // Control flow & keywords
+            'break', 'continue', 'for', 'while', 'return', 'if', 'else',
             // Primitives & Core types
             'int', 'double', 'boolean', 'char', 'long', 'void', 'String', 'Math', 'System',
             // Core DSA Structures
@@ -61,6 +63,8 @@ const languageData = {
 
     "c++": {
         keywords: [
+            // Control flow & keywords
+            'break', 'continue', 'for', 'while', 'return', 'if', 'else',
             // Primitives & structures
             'int', 'long long', 'double', 'char', 'bool', 'string', 'void', 'auto',
             'vector<>', 'unordered_map<>', 'unordered_set<>', 'map<>', 'set<>',
@@ -115,7 +119,8 @@ const languageData = {
             'heapq.heappush', 'heapq.heappop', 'heapq.heapify', 'math.sqrt',
             'abs()', 'min()', 'max()', 'sum()', 'len()', 'sorted()', 'range()',
             'append()', 'pop()', 'insert()', 'remove()', 'split()', 'join()',
-            'def', 'class', 'import', 'return', 'if', 'else', 'for', 'while', 'in'
+            'def', 'class', 'import', 'return', 'if', 'else', 'for', 'while', 'in',
+            'break', 'continue'
         ],
         bigrams: {
             'for': ['i in range():'],
@@ -136,7 +141,8 @@ const languageData = {
             'Math.max()', 'Math.min()', 'Math.abs()', 'Math.floor()', 'Math.ceil()', 'Math.sqrt()',
             'push()', 'pop()', 'shift()', 'unshift()', 'slice()', 'splice()', 'join()', 'split()',
             'set()', 'get()', 'has()', 'delete()', 'add()', 'clear()', 'size',
-            'const', 'let', 'function', 'return', 'if', 'else', 'for', 'while', 'new'
+            'const', 'let', 'function', 'return', 'if', 'else', 'for', 'while', 'new',
+            'break', 'continue'
         ],
         bigrams: {
             'for': ['(let i = 0; i < ; i++) {'],
