@@ -150,7 +150,6 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
     const scored = suggestions.map(word => {
         const wordLower = word.toLowerCase();
         let matchScore = 0;
-        let isPrefixMatch = 1; // 0 for abbreviations and prefix matches, 1 for others
         let isAbbr = false;
 
         // Check if it's an abbreviation expansion
@@ -164,12 +163,25 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
             }
         }
         
-        if (isAbbr) {
-            matchScore = 150; // High base score for abbreviation expansions
-            isPrefixMatch = 0;
-        } else if (wordLower.startsWith(typingLower)) {
+        // Define caseMatchLevel:
+        // 0: Exact string & case match
+        // 1: Case-sensitive prefix match OR abbreviation match
+        // 2: Case-insensitive prefix match
+        // 3: Others (Subsequence/Fuzzy)
+        let caseMatchLevel = 3;
+        
+        if (word === typingWord) {
+            caseMatchLevel = 0;
+            matchScore = 200;
+        } else if (isAbbr) {
+            caseMatchLevel = 1;
+            matchScore = 150;
+        } else if (word.startsWith(typingWord)) {
+            caseMatchLevel = 1;
             matchScore = 120 + (typingWord.length / word.length) * 15;
-            isPrefixMatch = 0;
+        } else if (wordLower.startsWith(typingLower)) {
+            caseMatchLevel = 2;
+            matchScore = 100 + (typingWord.length / word.length) * 15;
         } else {
             const subScore = scoreSubsequence(typingLower, wordLower, word);
             if (subScore !== null) {
@@ -178,18 +190,18 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
                 const dist = getDamerauLevenshteinDistance(typingLower, wordLower);
                 matchScore = 10 + (3 - dist) * 10;
             }
-            isPrefixMatch = 1;
+            caseMatchLevel = 3;
         }
         
         const tf = wordFrequency[word] || 0;
         const tfBoost = Math.min(tf * 3, 25);
         
-        return { word, score: matchScore + tfBoost, isPrefixMatch };
+        return { word, score: matchScore + tfBoost, caseMatchLevel };
     });
     
     scored.sort((a, b) => {
-        if (a.isPrefixMatch !== b.isPrefixMatch) {
-            return a.isPrefixMatch - b.isPrefixMatch;
+        if (a.caseMatchLevel !== b.caseMatchLevel) {
+            return a.caseMatchLevel - b.caseMatchLevel;
         }
         return b.score - a.score || a.word.localeCompare(b.word);
     });
