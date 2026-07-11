@@ -29,16 +29,19 @@ class Trie {
         node.words.add(word); 
     }
     
-    _findWords(node, results) {
+    _findWords(node, results, maxCount = 30) {
+        if (results.length >= maxCount) return;
         for (let word of node.words) {
             results.push(word);
+            if (results.length >= maxCount) return;
         }
         for (let char in node.children) {
-            this._findWords(node.children[char], results);
+            this._findWords(node.children[char], results, maxCount);
+            if (results.length >= maxCount) return;
         }
     }
     
-    getWordsWithPrefix(prefix) {
+    getWordsWithPrefix(prefix, maxCount = 30) {
         let node = this.root;
         let lowerPrefix = prefix.toLowerCase(); 
         
@@ -48,7 +51,7 @@ class Trie {
         }
         
         let results = [];
-        this._findWords(node, results);
+        this._findWords(node, results, maxCount);
         return results;
     }
 

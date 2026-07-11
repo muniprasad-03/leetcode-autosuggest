@@ -8,6 +8,7 @@ let lastCursorPos = { top: '150px', left: '150px' };
 let wordFrequency = {};
 let lastParsedCode = "";
 let inputTimeout = null;
+let extractTimeout = null;
 
 function preLoadDataTypes(lang) {
     if (typeof languageData !== 'undefined' && languageData[lang] && languageData[lang].keywords) {
@@ -52,6 +53,7 @@ function tokenizeCode(codeText, lang) {
 }
 
 function extractWordsToTrie() {
+    if (document.hidden) return;
     const lineElements = document.querySelectorAll('.view-line');
     if (lineElements.length === 0) return;
 
@@ -204,6 +206,9 @@ function handleInput(event) {
     const modifiers = new Set(['Shift', 'Control', 'Alt', 'Meta', 'CapsLock']);
     if (modifiers.has(event.key)) return;
 
+    if (extractTimeout) clearTimeout(extractTimeout);
+    extractTimeout = setTimeout(extractWordsToTrie, 1500);
+
     if (event.key === 'Backspace') {
         const active = document.activeElement;
         if (active && active.tagName === 'TEXTAREA') {
@@ -307,7 +312,8 @@ function handleInput(event) {
                 suggestions = rankSuggestions(suggestions, currentTypingWord, wordFrequency);
             }
 
-            suggestions = suggestions.filter(w => w.toLowerCase() !== currentTypingWord.toLowerCase());
+            const typingLower = currentTypingWord.toLowerCase();
+            suggestions = suggestions.filter(w => w.toLowerCase() !== typingLower);
         }
 
         // 3. Space prediction
@@ -344,5 +350,5 @@ document.addEventListener('mousedown', (e) => {
 
 createSuggestionBox();
 extractWordsToTrie();
-setInterval(extractWordsToTrie, 2000);
+setInterval(extractWordsToTrie, 5000);
 window.addEventListener('keydown', handleInput, true);

@@ -12,13 +12,10 @@ function isAlphanumericChar(char) {
            (code >= 97 && code <= 122);   // a-z
 }
 
-// Calculates Damerau-Levenshtein distance between string 'a' and 'b'.
-function getDamerauLevenshteinDistance(a, b) {
-    a = a.toLowerCase();
-    b = b.toLowerCase();
-    
-    const aLen = a.length;
-    const bLen = b.length;
+// Calculates Damerau-Levenshtein distance between lowercase strings 'aLower' and 'bLower'.
+function getDamerauLevenshteinDistance(aLower, bLower) {
+    const aLen = aLower.length;
+    const bLen = bLower.length;
     
     if (aLen === 0) return bLen;
     if (bLen === 0) return aLen;
@@ -37,7 +34,7 @@ function getDamerauLevenshteinDistance(a, b) {
     
     for (let j = 1; j <= bLen; j++) {
         for (let i = 1; i <= aLen; i++) {
-            const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
+            const indicator = aLower[i - 1] === bLower[j - 1] ? 0 : 1;
             matrix[j][i] = Math.min(
                 matrix[j][i - 1] + 1,            // insertion
                 matrix[j - 1][i] + 1,            // deletion
@@ -45,7 +42,7 @@ function getDamerauLevenshteinDistance(a, b) {
             );
             
             // Transposition check
-            if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+            if (i > 1 && j > 1 && aLower[i - 1] === bLower[j - 2] && aLower[i - 2] === bLower[j - 1]) {
                 matrix[j][i] = Math.min(
                     matrix[j][i],
                     matrix[j - 2][i - 2] + indicator // transposition
@@ -59,11 +56,12 @@ function getDamerauLevenshteinDistance(a, b) {
 // Filters words within maxDistance, sorted by distance.
 function getFuzzySuggestions(targetWord, allWords, maxDistance = 2) {
     let matches = [];
+    const targetLower = targetWord.toLowerCase();
     const targetLen = targetWord.length;
     for (let word of allWords) {
         if (Math.abs(word.length - targetLen) > maxDistance) continue;
         
-        let dist = getDamerauLevenshteinDistance(targetWord, word);
+        let dist = getDamerauLevenshteinDistance(targetLower, word.toLowerCase());
         if (dist <= maxDistance) {
             matches.push({ word, dist });
         }
@@ -73,18 +71,15 @@ function getFuzzySuggestions(targetWord, allWords, maxDistance = 2) {
 }
 
 // Scores subsequence match; favors starts, CamelCase boundaries, and consecutive chars.
-function scoreSubsequence(pattern, word) {
-    if (pattern.length === 0) return 0;
+function scoreSubsequence(patternLower, wordLower, word) {
+    if (patternLower.length === 0) return 0;
     
     let pIdx = 0;
     let wIdx = 0;
     let score = 0;
     let lastMatchedIdx = -1;
     
-    const patternLower = pattern.toLowerCase();
-    const wordLower = word.toLowerCase();
-    
-    while (wIdx < word.length && pIdx < pattern.length) {
+    while (wIdx < word.length && pIdx < patternLower.length) {
         if (wordLower[wIdx] === patternLower[pIdx]) {
             let weight = 1;
             
@@ -107,8 +102,8 @@ function scoreSubsequence(pattern, word) {
         wIdx++;
     }
     
-    if (pIdx === pattern.length) {
-        score -= (word.length - pattern.length) * 0.15; // length penalty
+    if (pIdx === patternLower.length) {
+        score -= (word.length - patternLower.length) * 0.15; // length penalty
         return score;
     }
     return null;
@@ -118,10 +113,11 @@ function scoreSubsequence(pattern, word) {
 function getSubsequenceSuggestions(targetWord, allWords) {
     let matches = [];
     const targetLen = targetWord.length;
+    const targetLower = targetWord.toLowerCase();
     for (let word of allWords) {
         if (word.length < targetLen) continue; // Length pruning optimization
         
-        const score = scoreSubsequence(targetWord, word);
+        const score = scoreSubsequence(targetLower, word.toLowerCase(), word);
         if (score !== null) {
             matches.push({ word, score });
         }
@@ -175,11 +171,11 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
             matchScore = 120 + (typingWord.length / word.length) * 15;
             isPrefixMatch = 0;
         } else {
-            const subScore = scoreSubsequence(typingWord, word);
+            const subScore = scoreSubsequence(typingLower, wordLower, word);
             if (subScore !== null) {
                 matchScore = 60 + subScore;
             } else {
-                const dist = getDamerauLevenshteinDistance(typingWord, word);
+                const dist = getDamerauLevenshteinDistance(typingLower, wordLower);
                 matchScore = 10 + (3 - dist) * 10;
             }
             isPrefixMatch = 1;
