@@ -14,13 +14,18 @@
         "styles.css"
       ],
       "js": [
-        "dictionary.js",
         "trie.js",
         "nlp.js",
         "ai.js",
         "content.js"
       ],
       "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["dictionaries/*.json"],
+      "matches": ["*://leetcode.com/*"]
     }
   ]
 }

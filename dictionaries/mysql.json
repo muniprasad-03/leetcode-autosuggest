@@ -1,0 +1,35 @@
+{
+  "keywords": [
+    "SELECT",
+    "FROM",
+    "WHERE",
+    "JOIN",
+    "ON",
+    "GROUP BY",
+    "ORDER BY",
+    "LIMIT",
+    "AS",
+    "AND",
+    "OR",
+    "NOT",
+    "COUNT()",
+    "SUM()",
+    "AVG()",
+    "MIN()",
+    "MAX()",
+    "CASE",
+    "WHEN",
+    "THEN",
+    "ELSE",
+    "END"
+  ],
+  "abbreviations": {},
+  "bigrams": {
+    "SELECT": ["*", "COUNT(*)", "DISTINCT", "id"],
+    "WHERE": ["id =", "status ="],
+    "GROUP": ["BY "],
+    "ORDER": ["BY "],
+    "ON": ["a.id = b.id"],
+    "inner join": ["users", "orders"]
+  }
+}

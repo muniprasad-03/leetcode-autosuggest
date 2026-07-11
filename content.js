@@ -10,9 +10,39 @@ let lastParsedCode = "";
 let inputTimeout = null;
 let extractTimeout = null;
 
+window.languageData = {};
+const loadedLanguages = {};
+
+async function ensureLanguageDictionary(lang) {
+    if (lang === "unknown" || loadedLanguages[lang]) return;
+    
+    let filename = lang;
+    if (lang === "c++") filename = "cpp";
+    if (lang === "python3") filename = "python";
+    if (lang === "js") filename = "javascript";
+    
+    try {
+        const url = chrome.runtime.getURL(`dictionaries/${filename}.json`);
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        window.languageData[lang] = data;
+        if (lang === "python") window.languageData["python3"] = data;
+        if (lang === "javascript") window.languageData["js"] = data;
+        
+        loadedLanguages[lang] = true;
+        if (lang === "python") loadedLanguages["python3"] = true;
+        if (lang === "javascript") loadedLanguages["js"] = true;
+        
+        extractWordsToTrie();
+    } catch (e) {
+        console.error(`[AutoSuggest] Failed to load dictionary for ${lang}:`, e);
+    }
+}
+
 function preLoadDataTypes(lang) {
-    if (typeof languageData !== 'undefined' && languageData[lang] && languageData[lang].keywords) {
-        languageData[lang].keywords.forEach(type => {
+    if (window.languageData && window.languageData[lang] && window.languageData[lang].keywords) {
+        window.languageData[lang].keywords.forEach(type => {
             trie.insert(type);
         });
     }
@@ -57,7 +87,13 @@ function extractWordsToTrie() {
     const lineElements = document.querySelectorAll('.view-line');
     if (lineElements.length === 0) return;
 
-    currentLanguage = getLeetCodeLanguage();
+    const lang = getLeetCodeLanguage();
+    if (lang !== currentLanguage) {
+        currentLanguage = lang;
+        if (lang !== "unknown" && (!window.languageData || !window.languageData[lang])) {
+            ensureLanguageDictionary(lang);
+        }
+    }
 
     let codeText = "";
     lineElements.forEach(line => { codeText += line.textContent + "\n"; });
@@ -69,8 +105,8 @@ function extractWordsToTrie() {
     preLoadDataTypes(currentLanguage); 
     
     wordFrequency = {};
-    if (typeof languageData !== 'undefined' && languageData[currentLanguage]?.keywords) {
-        languageData[currentLanguage].keywords.forEach(keyword => {
+    if (window.languageData && window.languageData[currentLanguage]?.keywords) {
+        window.languageData[currentLanguage].keywords.forEach(keyword => {
             wordFrequency[keyword] = 5; // seed base keyword weights
         });
     }
@@ -268,8 +304,8 @@ function handleInput(event) {
         let isPrediction = false;
 
         // 1. Member completion
-        if (typeof getMemberCompletions === 'function' && typeof languageData !== 'undefined' && languageData[currentLanguage]?.bigrams) {
-            const memberCompletions = getMemberCompletions(textBeforeCursor, languageData[currentLanguage].bigrams);
+        if (typeof getMemberCompletions === 'function' && window.languageData && window.languageData[currentLanguage]?.bigrams) {
+            const memberCompletions = getMemberCompletions(textBeforeCursor, window.languageData[currentLanguage].bigrams);
             if (memberCompletions && memberCompletions.length > 0) {
                 suggestions = memberCompletions;
                 isPrediction = true;
@@ -278,8 +314,8 @@ function handleInput(event) {
 
         // 2. Trie & fallback matching
         if (suggestions.length === 0 && currentTypingWord.length >= 1) {
-            if (typeof languageData !== 'undefined' && languageData[currentLanguage]?.abbreviations) {
-                const abbrs = languageData[currentLanguage].abbreviations;
+            if (window.languageData && window.languageData[currentLanguage]?.abbreviations) {
+                const abbrs = window.languageData[currentLanguage].abbreviations;
                 const typingLower = currentTypingWord.toLowerCase();
                 for (const key in abbrs) {
                     if (key.startsWith(typingLower)) {
@@ -318,8 +354,8 @@ function handleInput(event) {
 
         // 3. Space prediction
         if (suggestions.length === 0 && currentTypingWord.length === 0) {
-            if (typeof getPredictiveSuggestions === 'function' && typeof languageData !== 'undefined' && languageData[currentLanguage]?.bigrams) {
-                const predictions = getPredictiveSuggestions(textBeforeCursor, languageData[currentLanguage].bigrams);
+            if (typeof getPredictiveSuggestions === 'function' && window.languageData && window.languageData[currentLanguage]?.bigrams) {
+                const predictions = getPredictiveSuggestions(textBeforeCursor, window.languageData[currentLanguage].bigrams);
                 if (predictions.length > 0) {
                     suggestions = predictions;
                     isPrediction = true;
