@@ -3,6 +3,7 @@ const languageData = {
         keywords: [
             // Control flow & keywords
             'break', 'continue', 'for()', 'while()', 'return', 'if()', 'else',
+            'public', 'private', 'protected', 'static', 'final', 'class', 'interface', 'new', 'void', 'import', 'package',
             // Primitives & Core types
             'int', 'double', 'boolean', 'char', 'long', 'void', 'String', 'Math', 'System',
             // Core DSA Structures
@@ -67,6 +68,7 @@ const languageData = {
         keywords: [
             // Control flow & keywords
             'break', 'continue', 'for()', 'while()', 'return', 'if()', 'else',
+            'public', 'private', 'protected', 'static', 'const', 'class', 'struct', 'new', 'void', 'template', 'typename',
             // Primitives & structures
             'int', 'long long', 'double', 'char', 'bool', 'string', 'void', 'auto',
             'vector<>', 'unordered_map<>', 'unordered_set<>', 'map<>', 'set<>',
@@ -148,6 +150,7 @@ const languageData = {
             'push()', 'pop()', 'shift()', 'unshift()', 'slice()', 'splice()', 'join()', 'split()',
             'set()', 'get()', 'has()', 'delete()', 'add()', 'clear()', 'size',
             'const', 'let', 'function', 'return', 'if()', 'else', 'for()', 'while()', 'new',
+            'class', 'static', 'public', 'private', 'protected', 'void',
             'break', 'continue'
         ],
         abbreviations: {

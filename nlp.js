@@ -2,8 +2,7 @@
 let dlMatrix = null;
 const DL_MAX_SIZE = 64;
 
-// Global tracking of inbuilt keywords to prioritize user definitions over them
-const inbuiltKeywords = new Set();
+// No global inbuiltKeywords restriction
 
 // Fast character code check replacing slow RegExp test
 function isAlphanumericChar(char) {
@@ -155,9 +154,24 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
     const scored = suggestions.map(word => {
         const wordLower = word.toLowerCase();
         let matchScore = 0;
-        let isPrefixMatch = 0; // 0 for prefix matches, 1 for others (lower number = higher priority)
+        let isPrefixMatch = 1; // 0 for abbreviations and prefix matches, 1 for others
+        let isAbbr = false;
+
+        // Check if it's an abbreviation expansion
+        if (typeof languageData !== 'undefined' && typeof currentLanguage !== 'undefined' && languageData[currentLanguage]?.abbreviations) {
+            const abbrs = languageData[currentLanguage].abbreviations;
+            for (const key in abbrs) {
+                if (key.startsWith(typingLower) && abbrs[key] === word) {
+                    isAbbr = true;
+                    break;
+                }
+            }
+        }
         
-        if (wordLower.startsWith(typingLower)) {
+        if (isAbbr) {
+            matchScore = 150; // High base score for abbreviation expansions
+            isPrefixMatch = 0;
+        } else if (wordLower.startsWith(typingLower)) {
             matchScore = 120 + (typingWord.length / word.length) * 15;
             isPrefixMatch = 0;
         } else {
@@ -174,43 +188,12 @@ function rankSuggestions(suggestions, typingWord, wordFrequency = {}) {
         const tf = wordFrequency[word] || 0;
         const tfBoost = Math.min(tf * 3, 25);
         
-        // Priority categories:
-        // Category 0: Abbreviation matches (highest priority)
-        // Category 1: Variables (not ending in (), not in inbuiltKeywords)
-        // Category 2: Functions in the editor (ending in (), not in inbuiltKeywords)
-        // Category 3: Inbuilt methods/keywords (in inbuiltKeywords)
-        let category = 3;
-        let isAbbr = false;
-        if (typeof languageData !== 'undefined' && typeof currentLanguage !== 'undefined' && languageData[currentLanguage]?.abbreviations) {
-            const abbrs = languageData[currentLanguage].abbreviations;
-            for (const key in abbrs) {
-                if (key.startsWith(typingLower) && abbrs[key] === word) {
-                    isAbbr = true;
-                    break;
-                }
-            }
-        }
-
-        if (isAbbr) {
-            category = 0;
-            isPrefixMatch = 0;
-        } else if (typeof inbuiltKeywords !== 'undefined' && inbuiltKeywords.has(word)) {
-            category = 3;
-        } else if (word.endsWith('()')) {
-            category = 2;
-        } else {
-            category = 1;
-        }
-        
-        return { word, score: matchScore + tfBoost, category, isPrefixMatch };
+        return { word, score: matchScore + tfBoost, isPrefixMatch };
     });
     
     scored.sort((a, b) => {
         if (a.isPrefixMatch !== b.isPrefixMatch) {
             return a.isPrefixMatch - b.isPrefixMatch;
-        }
-        if (a.category !== b.category) {
-            return a.category - b.category;
         }
         return b.score - a.score || a.word.localeCompare(b.word);
     });
