@@ -1,5 +1,14 @@
 {
   "keywords": [
+    "True",
+    "False",
+    "None",
+    "sys.maxsize",
+    "float('inf')",
+    "float('-inf')",
+    "bisect.bisect_left",
+    "bisect.bisect_right",
+    "bisect.bisect",
     "int",
     "str",
     "bool",
@@ -7,7 +16,6 @@
     "dict",
     "set",
     "tuple",
-    "None",
     "collections.Counter",
     "collections.deque",
     "collections.defaultdict",

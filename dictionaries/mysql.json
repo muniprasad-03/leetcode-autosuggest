@@ -1,5 +1,8 @@
 {
   "keywords": [
+    "TRUE",
+    "FALSE",
+    "NULL",
     "SELECT",
     "FROM",
     "WHERE",
